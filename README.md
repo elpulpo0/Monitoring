@@ -4,7 +4,7 @@ Ce dépôt contient une configuration complète pour mettre en place un système
 
 ## 📌 Prérequis
 
-- Docker et Docker Compose installés sur votre machine.
+- Docker et Docker Compose V2 installés sur votre machine.
 
 ## 📂 Structure du projet
 
@@ -27,13 +27,13 @@ monitoring/
 2. Démarrez les services :  
 
    ```sh
-   docker-compose up -d
+   docker compose up -d
    ```  
 
 3. Vérifiez que les conteneurs sont en cours d'exécution :  
 
    ```sh
-   docker ps
+   docker ps -a
    ```  
 
 ## 🔧 Configuration des services  
