@@ -21,7 +21,7 @@ monitoring/
 1. Clonez le dépôt :  
 
    ```sh
-   git clone https://github.com/elpulpo0/Monitoring && cd monitoring
+   git clone https://github.com/elpulpo0/Monitoring && cd Monitoring
    ```  
 
 2. Démarrez les services :  
