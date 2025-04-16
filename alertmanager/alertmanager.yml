@@ -1,0 +1,13 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: 'versus-incident'
+  group_wait: 10s
+  group_interval: 5m
+
+receivers:
+- name: 'versus-incident'
+  webhook_configs:
+  - url: 'http://monitoring_versus-incident:3000/api/incidents'
+    send_resolved: false

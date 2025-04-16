@@ -23,6 +23,7 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/alerts.yml:/etc/prometheus/alerts.yml
       - prometheus-data:/prometheus
     networks:
       - monitoring_net
@@ -51,6 +52,34 @@ services:
     privileged: true
     networks:
       - monitoring_net
+      
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: monitoring_alertmanager
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    restart: always
+    ports:
+      - "9093:9093"
+    networks:
+      - monitoring_net
+    labels:
+      org.label-schema.group: "monitoring"
+
+  versus-incident:
+    image: ghcr.io/versuscontrol/versus-incident:latest
+    container_name: monitoring_versus-incident
+    ports:
+      - "3001:3001"
+    networks:
+      - monitoring_net
+    environment:
+      - TELEGRAM_ENABLE=true
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+    volumes:
+      - ./versus-incident/config/:/app/config/
+    restart: unless-stopped
 
 networks:
   monitoring_net:

@@ -1,0 +1,11 @@
+<b>[ALERT] {{ .commonLabels.alertname }}</b>
+
+{{ range .alerts }}
+[START] {{ .startsAt | formatTime }}
+{{ .annotations.summary }}
+{{ end }}
+
+<pre>
+Status: {{ .status }}
+Severity: {{ .commonLabels.severity }}
+</pre>

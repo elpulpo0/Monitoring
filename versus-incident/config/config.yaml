@@ -1,0 +1,12 @@
+name: versus
+host: 0.0.0.0
+port: 3000
+
+alert:
+  debug_body: true
+  
+  telegram:
+    enable: true
+    bot_token: ${TELEGRAM_BOT_TOKEN}
+    chat_id: ${TELEGRAM_CHAT_ID}
+    template_path: "/app/config/telegram_message.tmpl"

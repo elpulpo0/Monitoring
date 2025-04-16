@@ -1,20 +1,34 @@
-# Monitoring avec Prometheus, Grafana, Node Exporter et cAdvisor
+# Monitoring d'infrastructure et de containers Docker avec alertes via Telegram
 
-Ce dépôt contient une configuration complète pour mettre en place un système de monitoring basé sur **Prometheus**, **Grafana**, **Node Exporter** et **cAdvisor**.
+Ce dépôt contient une configuration complète pour mettre en place un système de monitoring. Il est basé sur :
+- **Prometheus**
+- **Grafana**
+- **Node Exporter**
+- **cAdvisor**
+- **AlertManager**
+- **Versus-Incident**
 
 ## 📌 Prérequis
 
 - Docker et Docker Compose installés sur votre machine.
+- Un environnement Linux ou Mac (cAdvisor ne fonctionne pas sur Windows dans cette version)
 
 ## 📂 Structure du projet
 
 ```sh
 monitoring/
+│── alertmanager/
+│   └── alertmanager.yml  # Configuration générale de AlertManager
 │── prometheus/
-│   └── prometheus.yml  # Configuration de Prometheus
+│   └── alerts.yml # Configuration des alertes pour Prometheus
+│   └── prometheus.yml  # Configuration générale de Prometheus
+│── versus-incident/
+│   └── config/
+│   │   └── config.yaml # Configuration générale de Versus-Incident
+│   │   └── telegram_message.tmpl # Template pour la notification sur le client Telegram
+│── .env # Variables liées au client pour les notifications, ici Telegram
 │── docker-compose.yaml  # Déploiement des services avec Docker Compose
 ```
-
 
 ## 🚀 Installation  
 
@@ -27,14 +41,21 @@ monitoring/
 2. Démarrez les services :  
 
    ```sh
-   docker-compose up -d
+   docker-compose up -d --build
    ```  
 
 3. Vérifiez que les conteneurs sont en cours d'exécution :  
 
    ```sh
-   docker ps
+   docker ps -a
    ```  
+
+## Copier et éditer le fichier .env_example en .env
+
+```sh
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_CHAT_ID=
+```
 
 ## 🔧 Configuration des services  
 
@@ -77,12 +98,14 @@ Ajoutez les dashboards Grafana suivants :
 
 ## 📌 Ports exposés  
 
-| Service       | Port  |  
-|--------------|------|  
-| Grafana      | 3000 |  
-| Prometheus   | 9090 |  
-| Node Exporter | 9100 |  
-| cAdvisor     | 8080 |  
+| Service          | Port |
+|------------------|------|
+| Grafana          | 3000 |
+| Prometheus       | 9090 |
+| Node Exporter    | 9100 |
+| cAdvisor         | 8080 |
+| alertmanager     | 9093 |
+| versus-incident  | 3001 |
 
 ## 🛑 Arrêter et supprimer les conteneurs  
 
