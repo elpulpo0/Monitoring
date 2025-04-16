@@ -10,7 +10,7 @@ Ce dépôt contient une configuration complète pour mettre en place un système
 
 ## 📌 Prérequis
 
-- Docker et Docker Compose installés sur votre machine.
+- Docker et Docker Compose V2 installés sur votre machine.
 - Un environnement Linux ou Mac (cAdvisor ne fonctionne pas sur Windows dans cette version)
 
 ## 📂 Structure du projet
@@ -35,7 +35,7 @@ monitoring/
 1. Clonez le dépôt :  
 
    ```sh
-   git clone https://github.com/elpulpo0/Monitoring && cd monitoring
+   git clone https://github.com/elpulpo0/Monitoring && cd Monitoring
    ```  
 
 2. Démarrez les services :  
