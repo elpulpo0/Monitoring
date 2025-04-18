@@ -18,16 +18,23 @@ Ce dépôt contient une configuration complète pour mettre en place un système
 ```sh
 monitoring/
 │── alertmanager/
-│   └── alertmanager.yml  # Configuration générale de AlertManager
+│   └── alertmanager.yml          # Configuration générale de AlertManager
+│── grafana/
+│   └── dashboards/               # Fichiers json des dashboards pré-installés
+│   └── provisionning/
+│   │   └── dashboards/
+│   │   │   └── dashboards.yml    # Configuration des dashboards pour Grafana
+│   │   └── datasources/
+│   │   │   └── datasources.yml    # Configuration des sources pour Grafana
 │── prometheus/
-│   └── alerts.yml # Configuration des alertes pour Prometheus
-│   └── prometheus.yml  # Configuration générale de Prometheus
+│   └── alerts.yml                # Configuration des alertes pour Prometheus
+│   └── prometheus.yml            # Configuration générale de Prometheus
 │── versus-incident/
 │   └── config/
-│   │   └── config.yaml # Configuration générale de Versus-Incident
+│   │   └── config.yaml           # Configuration générale de Versus-Incident
 │   │   └── telegram_message.tmpl # Template pour la notification sur le client Telegram
-│── .env # Variables liées au client pour les notifications, ici Telegram
-│── docker-compose.yaml  # Déploiement des services avec Docker Compose
+│── .env                          # Variables liées au client pour les notifications, ici Telegram
+│── docker-compose.yaml           # Déploiement des services avec Docker Compose
 ```
 
 ## Copier et éditer le fichier .env_example en .env
@@ -35,6 +42,9 @@ monitoring/
 ```sh
 TELEGRAM_BOT_TOKEN=
 TELEGRAM_CHAT_ID=
+
+GRAFANA_ADMIN_USER=
+GRAFANA_ADMIN_PASSWORD=
 ```
 
 ## 🚀 Installation  
@@ -73,9 +83,7 @@ Accès à l'interface Web de Prometheus : [http://localhost:9090](http://localho
 
 L'interface de **Grafana** est accessible via : [http://localhost:3000](http://localhost:3000)  
 
-Connectez-vous avec les identifiants par défaut :  
-   - **Utilisateur** : `admin`  
-   - **Mot de passe** : `admin` (à modifier après la première connexion)  
+Connectez-vous avec les identifiants inscrits dans votre fichier .env :  
 
 ## 📊 Installation des Dashboards  
 

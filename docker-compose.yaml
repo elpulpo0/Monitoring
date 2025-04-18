@@ -7,6 +7,8 @@ services:
     environment:
       GF_RENDERING_CALLBACK_URL: http://grafana:3000/
       GF_LOG_FILTERS: rendering:debug
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
     depends_on:
       - prometheus
     links:
