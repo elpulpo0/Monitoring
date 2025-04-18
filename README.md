@@ -30,6 +30,13 @@ monitoring/
 │── docker-compose.yaml  # Déploiement des services avec Docker Compose
 ```
 
+## Copier et éditer le fichier .env_example en .env
+
+```sh
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_CHAT_ID=
+```
+
 ## 🚀 Installation  
 
 1. Clonez le dépôt :  
@@ -50,13 +57,6 @@ monitoring/
    docker ps -a
    ```  
 
-## Copier et éditer le fichier .env_example en .env
-
-```sh
-TELEGRAM_BOT_TOKEN=
-TELEGRAM_CHAT_ID=
-```
-
 ## 🔧 Configuration des services  
 
 ### Prometheus  
@@ -73,28 +73,24 @@ Accès à l'interface Web de Prometheus : [http://localhost:9090](http://localho
 
 L'interface de **Grafana** est accessible via : [http://localhost:3000](http://localhost:3000)  
 
-1. Connectez-vous avec les identifiants par défaut :  
+Connectez-vous avec les identifiants par défaut :  
    - **Utilisateur** : `admin`  
    - **Mot de passe** : `admin` (à modifier après la première connexion)  
 
-2. Ajoutez Prometheus comme source de données :  
-   - Allez dans **Configuration** > **Data Sources**  
-   - Cliquez sur **Add data source**  
-   - Sélectionnez **Prometheus**  
-   - Configurez l’URL : `http://prometheus:9090`
-   - Cliquez sur **Save & Test**  
-
 ## 📊 Installation des Dashboards  
 
-Ajoutez les dashboards Grafana suivants :  
+**Les dashboards suivants sont déjà implémentés :**
 
-1. **Node Exporter Full** (ID: `1860`) :  
-   - Allez dans **Dashboards** > **Import**  
-   - Entrez l’ID `1860` et cliquez sur **Load**  
-   - Sélectionnez la source de données **Prometheus** et cliquez sur **Import**  
+- **Node Exporter Full** (ID: `1860`)
+- **Docker Monitoring** (ID: `193`) :
 
-2. **Docker Monitoring** (ID: `193`) :  
-   - Répétez la procédure avec l’ID `193`  
+**Pour en ajouter d'autres :**
+
+- Visitez https://grafana.com/grafana/dashboards/
+- Récupérez l'ID du dashboard que vous voulez installer
+- Allez dans **Dashboards** > **Import**  
+- Entrez l’ID de votre dashboard et cliquez sur **Load**  
+- Sélectionnez la source de données **Prometheus** et cliquez sur **Import**  
 
 ## 📌 Ports exposés  
 
