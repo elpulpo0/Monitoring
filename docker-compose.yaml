@@ -20,6 +20,7 @@ services:
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
       - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - ./grafana/dashboards:/var/lib/grafana/dashboards
+    restart: always
 
   prometheus:
     container_name: monitoring_prometheus
@@ -32,6 +33,7 @@ services:
       - prometheus-data:/prometheus
     networks:
       - monitoring_net
+    restart: always
 
   node_exporter:
     container_name: monitoring_node_exporter
@@ -40,6 +42,7 @@ services:
       - "9100:9100"
     networks:
       - monitoring_net
+    restart: always
       
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.52.1
@@ -57,6 +60,7 @@ services:
     privileged: true
     networks:
       - monitoring_net
+    restart: always
       
   alertmanager:
     image: prom/alertmanager:latest
@@ -85,7 +89,7 @@ services:
       - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
     volumes:
       - ./versus-incident/config/:/app/config/
-    restart: unless-stopped
+    restart: always
 
 networks:
   monitoring_net:
