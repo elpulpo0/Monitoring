@@ -63,6 +63,7 @@ services:
     container_name: monitoring_alertmanager
     volumes:
       - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - alertmanager-data:/alertmanager
     restart: always
     ports:
       - "9093:9093"
@@ -93,3 +94,4 @@ networks:
 volumes:
   grafana-data:
   prometheus-data:
+  alertmanager-data:
