@@ -12,6 +12,7 @@ Ce dépôt contient une configuration complète pour mettre en place un système
 
 - Docker et Docker Compose V2 installés sur votre machine.
 - Un environnement Linux ou Mac (cAdvisor ne fonctionne pas sur Windows dans cette version)
+- L'adresse IP ou le nom d'hôte de votre serveur (remplace `<SERVER_IP>` dans la suite)
 
 ## 📂 Structure du projet
 
@@ -21,7 +22,7 @@ monitoring/
 │   └── alertmanager.yml          # Configuration générale de AlertManager
 │── grafana/
 │   └── dashboards/               # Fichiers json des dashboards pré-installés
-│   └── provisionning/
+│   └── provisioning/
 │   │   └── dashboards/
 │   │   │   └── dashboards.yml    # Configuration des dashboards pour Grafana
 │   │   └── datasources/
@@ -72,16 +73,20 @@ GRAFANA_ADMIN_PASSWORD=
 ### Prometheus  
 
 Le fichier `prometheus.yml` configure la collecte des métriques depuis :  
-- **Prometheus** (`http://localhost:9090`)  
-- **Grafana** (`http://localhost:3000`)  
-- **Node Exporter** (`http://localhost:9100`)  
-- **cAdvisor** (`http://localhost:8080`)  
+- **Prometheus** (`http://<SERVER_IP>:9090`)  
+- **Grafana** (`http://<SERVER_IP>:3000`)  
+- **Node Exporter** (`http://<SERVER_IP>:9100`)  
+- **cAdvisor** (`http://<SERVER_IP>:8080`)  
 
-Accès à l'interface Web de Prometheus : [http://localhost:9090](http://localhost:9090)  
+Accès à l'interface Web de Prometheus : `http://<SERVER_IP>:9090`  
+
+> En local, remplacez `<SERVER_IP>` par `localhost`.
 
 ### Grafana  
 
-L'interface de **Grafana** est accessible via : [http://localhost:3000](http://localhost:3000)  
+L'interface de **Grafana** est accessible via : `http://<SERVER_IP>:3000`  
+
+> En local, remplacez `<SERVER_IP>` par `localhost`.  
 
 Connectez-vous avec les identifiants inscrits dans votre fichier .env :  
 
@@ -102,21 +107,23 @@ Connectez-vous avec les identifiants inscrits dans votre fichier .env :
 
 ## 📌 Ports exposés  
 
-| Service          | Port |
-|------------------|------|
-| Grafana          | 3000 |
-| Prometheus       | 9090 |
-| Node Exporter    | 9100 |
-| cAdvisor         | 8080 |
-| alertmanager     | 9093 |
-| versus-incident  | 3001 |
+| Service          | Port | URL                          |
+|------------------|------|------------------------------|
+| Grafana          | 3000 | `http://<SERVER_IP>:3000`    |
+| Prometheus       | 9090 | `http://<SERVER_IP>:9090`    |
+| Node Exporter    | 9100 | `http://<SERVER_IP>:9100`    |
+| cAdvisor         | 8080 | `http://<SERVER_IP>:8080`    |
+| AlertManager     | 9093 | `http://<SERVER_IP>:9093`    |
+| Versus-Incident  | 3001 | `http://<SERVER_IP>:3001`    |
 
 ## 🛑 Arrêter et supprimer les conteneurs  
 
 Pour arrêter le monitoring :  
 
-```shdocker-compose down```  
+```sh
+docker-compose down
+```  
 
 ## 📝 Licence  
 
-Ce projet est sous licence MIT.  
+Ce projet est sous licence MIT.

@@ -31,7 +31,7 @@ groups:
       description: "Docker host memory usage is {{ humanize $value}}%. Reported by instance {{ $labels.instance }} of job {{ $labels.job }}."
 
   - alert: high_storage_load
-    expr: (node_filesystem_size_bytes{fstype="aufs"} - node_filesystem_free_bytes{fstype="aufs"}) / node_filesystem_size_bytes{fstype="aufs"}  * 100 > 85
+    expr: (node_filesystem_size_bytes{mountpoint="/",fstype!~"tmpfs|rootfs"} - node_filesystem_free_bytes{mountpoint="/",fstype!~"tmpfs|rootfs"}) / node_filesystem_size_bytes{mountpoint="/",fstype!~"tmpfs|rootfs"} * 100 > 85
     for: 30s
     labels:
       severity: warning
@@ -39,27 +39,13 @@ groups:
       summary: "Server storage is almost full"
       description: "Docker host storage usage is {{ humanize $value}}%. Reported by instance {{ $labels.instance }} of job {{ $labels.job }}."
 
-- name: service
+- name: containers
   rules:
-  - alert: service_down
-    expr: probe_success == 0
-    for: 2m
-    labels:
-      severity: critical
-    annotations:
-      summary: "Service {{ $labels.name }} is down"
-      description: "Service {{ $labels.name }} is down ({{ $labels.instance }})"
-
   - alert: container_down
-    expr: absent(container_memory_usage_bytes{name="grafana"}) or
-          absent(container_memory_usage_bytes{name="node_exporter"}) or
-          absent(container_memory_usage_bytes{name="cadvisor"}) or
-          absent(container_memory_usage_bytes{name="alertmanager"}) or
-          absent(container_memory_usage_bytes{name="versus-incident"}) or
-          absent(container_memory_usage_bytes{name="apisecure_backend"})
-    for: 30s
+    expr: time() - container_last_seen{name!="",name!~".*POD.*"} > 60
+    for: 0m
     labels:
       severity: critical
     annotations:
       summary: "Container {{ $labels.name }} is down"
-      description: "Container {{ $labels.name }} is down for more than 30 seconds"
+      description: "Container {{ $labels.name }} has not been seen for more than 60 seconds."

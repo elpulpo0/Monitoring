@@ -9,5 +9,5 @@ route:
 receivers:
 - name: 'versus-incident'
   webhook_configs:
-  - url: 'http://monitoring_versus-incident:3000/api/incidents'
+  - url: 'http://versus-incident:3000/api/incidents'
     send_resolved: false

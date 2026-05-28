@@ -12,8 +12,6 @@ services:
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
     depends_on:
       - prometheus
-    links:
-      - prometheus
     networks:
       - monitoring_net
     volumes:
@@ -81,7 +79,7 @@ services:
     image: ghcr.io/versuscontrol/versus-incident:latest
     container_name: monitoring_versus-incident
     ports:
-      - "3001:3001"
+      - "3001:3000"
     networks:
       - monitoring_net
     environment:
