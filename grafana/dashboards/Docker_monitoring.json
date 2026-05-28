@@ -91,12 +91,10 @@
             },
             "editorMode": "code",
             "expr": "count(container_last_seen{image!=\"\"})",
-            "intervalFactor": 2,
+            "instant": true,
             "legendFormat": "",
             "metric": "container_last_seen",
-            "range": true,
-            "refId": "A",
-            "step": 240
+            "refId": "A"
           }
         ],
         "title": "Running containers",
@@ -171,11 +169,10 @@
               "uid": "eeghww02gc8w0e"
             },
             "expr": "sum(container_memory_usage_bytes{image!=\"\"})/1024/1024",
-            "intervalFactor": 2,
+            "instant": true,
             "legendFormat": "",
             "metric": "container_memory_usage_bytes",
-            "refId": "A",
-            "step": 240
+            "refId": "A"
           }
         ],
         "title": "Total Memory Usage",
@@ -252,11 +249,10 @@
               "uid": "eeghww02gc8w0e"
             },
             "expr": "sum(rate(container_cpu_user_seconds_total{image!=\"\"}[5m]) * 100)",
-            "intervalFactor": 2,
+            "instant": true,
             "legendFormat": "",
-            "metric": "container_memory_usage_bytes",
-            "refId": "A",
-            "step": 240
+            "metric": "container_cpu_user_seconds_total",
+            "refId": "A"
           }
         ],
         "title": "Total CPU Usage",
@@ -556,7 +552,7 @@
               "type": "prometheus",
               "uid": "eeghww02gc8w0e"
             },
-            "expr": "irate(container_network_receive_bytes_total{image!=\"\"}[5m])",
+            "expr": "rate(container_network_receive_bytes_total{image!=\"\"}[5m])",
             "intervalFactor": 2,
             "legendFormat": "{{name}}",
             "metric": "container_network_receive_bytes_total",
@@ -655,7 +651,7 @@
               "type": "prometheus",
               "uid": "eeghww02gc8w0e"
             },
-            "expr": "irate(container_network_transmit_bytes_total{image!=\"\"}[5m])",
+            "expr": "rate(container_network_transmit_bytes_total{image!=\"\"}[5m])",
             "intervalFactor": 2,
             "legendFormat": "{{name}}",
             "refId": "A",
