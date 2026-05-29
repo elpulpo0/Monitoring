@@ -11,7 +11,10 @@ services:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
     depends_on:
-      - prometheus
+      prometheus:
+        condition: service_healthy
+      loki:
+        condition: service_healthy
     networks:
       - monitoring_net
     volumes:
@@ -20,16 +23,21 @@ services:
       - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - ./grafana/dashboards:/var/lib/grafana/dashboards
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   prometheus:
     container_name: monitoring_prometheus
     image: prom/prometheus:latest
     ports:
       - "9090:9090"
-    environment:
-      - SERVER_NAME=${SERVER_NAME}
     entrypoint: ["/bin/sh", "/etc/prometheus/entrypoint.sh"]
     volumes:
+      - ./config.yml:/etc/prometheus/config.yml:ro
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./prometheus/alerts.yml:/etc/prometheus/alerts.yml
       - ./prometheus/entrypoint.sh:/etc/prometheus/entrypoint.sh
@@ -37,6 +45,12 @@ services:
     networks:
       - monitoring_net
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:9090/-/healthy || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
 
   node_exporter:
     container_name: monitoring_node_exporter
@@ -46,7 +60,12 @@ services:
     networks:
       - monitoring_net
     restart: always
-      
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:9100/metrics || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.52.1
     container_name: monitoring_cadvisor
@@ -64,7 +83,13 @@ services:
     networks:
       - monitoring_net
     restart: always
-      
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8080/healthz || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
   alertmanager:
     image: prom/alertmanager:latest
     container_name: monitoring_alertmanager
@@ -78,6 +103,11 @@ services:
       - monitoring_net
     labels:
       org.label-schema.group: "monitoring"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:9093/-/healthy || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
   versus-incident:
     image: ghcr.io/versuscontrol/versus-incident:latest
@@ -94,6 +124,61 @@ services:
       - ./versus-incident/config/:/app/config/
     restart: always
 
+  loki:
+    image: grafana/loki:latest
+    container_name: monitoring_loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki/loki.yml:/etc/loki/loki.yml
+      - loki-data:/loki
+    command: -config.file=/etc/loki/loki.yml
+    networks:
+      - monitoring_net
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3100/ready || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: monitoring_promtail
+    volumes:
+      - ./promtail/promtail.yml:/etc/promtail/promtail.yml
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    command: -config.file=/etc/promtail/promtail.yml
+    depends_on:
+      loki:
+        condition: service_healthy
+    networks:
+      - monitoring_net
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:9080/ready || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  blackbox_exporter:
+    image: prom/blackbox-exporter:latest
+    container_name: monitoring_blackbox_exporter
+    ports:
+      - "9115:9115"
+    volumes:
+      - ./blackbox/blackbox.yml:/etc/blackbox_exporter/config.yml
+    networks:
+      - monitoring_net
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:9115/-/healthy || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
 networks:
   monitoring_net:
     driver: bridge
@@ -102,3 +187,4 @@ volumes:
   grafana-data:
   prometheus-data:
   alertmanager-data:
+  loki-data:

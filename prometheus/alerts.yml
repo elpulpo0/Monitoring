@@ -39,6 +39,17 @@ groups:
       summary: "Server storage is almost full"
       description: "Docker host storage usage is {{ humanize $value}}%. Reported by instance {{ $labels.instance }} of job {{ $labels.job }}."
 
+- name: services
+  rules:
+  - alert: service_down
+    expr: probe_success == 0
+    for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Service {{ $labels.instance }} is down"
+      description: "Service {{ $labels.instance }} is unreachable for more than 2 minutes."
+
 - name: containers
   rules:
   - alert: container_down

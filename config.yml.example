@@ -1,0 +1,14 @@
+# =============================================================
+# Configuration de votre stack de monitoring
+# Copiez ce fichier en config.yml et adaptez les valeurs.
+# =============================================================
+
+# Nom du serveur affiché dans les alertes Telegram
+# Utilisez un nom distinct sur chaque serveur (ex: srv-prod-1, srv-prod-2)
+server_name: srv-prod-1
+
+# URLs à surveiller via le Blackbox Exporter
+# Une alerte Telegram est envoyée si l'URL est inaccessible pendant 2 minutes.
+blackbox_targets:
+  # - https://mon-service.example.com
+  # - https://api.example.com/health
