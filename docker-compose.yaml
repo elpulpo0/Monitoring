@@ -26,6 +26,12 @@ services:
     image: prom/prometheus:latest
     ports:
       - "9090:9090"
+    environment:
+      - SERVER_NAME=${SERVER_NAME}
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--config.expand-env=true'
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./prometheus/alerts.yml:/etc/prometheus/alerts.yml

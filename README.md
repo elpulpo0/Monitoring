@@ -1,12 +1,12 @@
 # Monitoring d'infrastructure et de containers Docker avec alertes via Telegram
 
 Ce dépôt contient une configuration complète pour mettre en place un système de monitoring. Il est basé sur :
-- **Prometheus**
-- **Grafana**
-- **Node Exporter**
-- **cAdvisor**
-- **AlertManager**
-- **Versus-Incident**
+- **Prometheus** : collecte des métriques
+- **Grafana** : visualisation
+- **Node Exporter** : métriques système (CPU, RAM, disque)
+- **cAdvisor** : métriques containers Docker (auto-détection de tous les containers)
+- **AlertManager** : routage des alertes
+- **Versus-Incident** : envoi des notifications Telegram
 
 ## 📌 Prérequis
 
@@ -26,86 +26,124 @@ monitoring/
 │   │   └── dashboards/
 │   │   │   └── dashboards.yml    # Configuration des dashboards pour Grafana
 │   │   └── datasources/
-│   │   │   └── datasources.yml    # Configuration des sources pour Grafana
+│   │   │   └── datasources.yml   # Configuration des sources pour Grafana
 │── prometheus/
 │   └── alerts.yml                # Configuration des alertes pour Prometheus
 │   └── prometheus.yml            # Configuration générale de Prometheus
 │── versus-incident/
 │   └── config/
 │   │   └── config.yaml           # Configuration générale de Versus-Incident
-│   │   └── telegram_message.tmpl # Template pour la notification sur le client Telegram
-│── .env                          # Variables liées au client pour les notifications, ici Telegram
+│   │   └── telegram_message.tmpl # Template des notifications Telegram
+│── .env                          # Variables d'environnement (non versionné)
+│── .env_example                  # Exemple de fichier .env
 │── docker-compose.yaml           # Déploiement des services avec Docker Compose
 ```
 
-## Copier et éditer le fichier .env_example en .env
+## ⚙️ Configuration (fichier .env)
+
+Copiez `.env_example` en `.env` et remplissez les valeurs :
 
 ```sh
-TELEGRAM_BOT_TOKEN=
-TELEGRAM_CHAT_ID=
-
-GRAFANA_ADMIN_USER=
-GRAFANA_ADMIN_PASSWORD=
+cp .env_example .env
 ```
 
-## 🚀 Installation  
+```sh
+TELEGRAM_BOT_TOKEN=        # Token du bot Telegram
+TELEGRAM_CHAT_ID=          # ID du chat Telegram
 
-1. Clonez le dépôt :  
+GRAFANA_ADMIN_USER=        # Identifiant admin Grafana
+GRAFANA_ADMIN_PASSWORD=    # Mot de passe admin Grafana
+
+SERVER_NAME=               # Nom du serveur (affiché dans les alertes Telegram)
+```
+
+> Sur chaque serveur, donnez un `SERVER_NAME` distinct (ex: `srv-prod-1`, `srv-prod-2`).
+> Ce nom apparaît dans toutes les notifications Telegram pour identifier la source de l'alerte.
+
+## 🚀 Installation
+
+1. Clonez le dépôt :
 
    ```sh
    git clone https://github.com/elpulpo0/Monitoring && cd Monitoring
-   ```  
+   ```
 
-2. Démarrez les services :  
+2. Créez et remplissez le fichier `.env` :
 
    ```sh
-   docker-compose up -d --build
-   ```  
+   cp .env_example .env
+   ```
 
-3. Vérifiez que les conteneurs sont en cours d'exécution :  
+3. Démarrez les services :
+
+   ```sh
+   docker compose up -d
+   ```
+
+4. Vérifiez que les conteneurs sont en cours d'exécution :
 
    ```sh
    docker ps -a
-   ```  
+   ```
 
-## 🔧 Configuration des services  
+## 🔧 Configuration des services
 
-### Prometheus  
+### Prometheus
 
-Le fichier `prometheus.yml` configure la collecte des métriques depuis :  
-- **Prometheus** (`http://<SERVER_IP>:9090`)  
-- **Grafana** (`http://<SERVER_IP>:3000`)  
-- **Node Exporter** (`http://<SERVER_IP>:9100`)  
-- **cAdvisor** (`http://<SERVER_IP>:8080`)  
+Le fichier `prometheus.yml` configure la collecte des métriques depuis :
+- **Prometheus** (`http://<SERVER_IP>:9090`)
+- **Grafana** (`http://<SERVER_IP>:3000`)
+- **Node Exporter** (`http://<SERVER_IP>:9100`)
+- **cAdvisor** (`http://<SERVER_IP>:8080`)
 
-Accès à l'interface Web de Prometheus : `http://<SERVER_IP>:9090`  
+Accès à l'interface Web de Prometheus : `http://<SERVER_IP>:9090`
 
 > En local, remplacez `<SERVER_IP>` par `localhost`.
 
-### Grafana  
+### Grafana
 
-L'interface de **Grafana** est accessible via : `http://<SERVER_IP>:3000`  
+L'interface de **Grafana** est accessible via : `http://<SERVER_IP>:3000`
 
-> En local, remplacez `<SERVER_IP>` par `localhost`.  
+> En local, remplacez `<SERVER_IP>` par `localhost`.
 
-Connectez-vous avec les identifiants inscrits dans votre fichier .env :  
+Connectez-vous avec les identifiants définis dans votre fichier `.env`.
 
-## 📊 Installation des Dashboards  
+**Réinitialiser le mot de passe admin si besoin :**
 
-**Les dashboards suivants sont déjà implémentés :**
+```sh
+docker exec -it monitoring_grafana grafana cli admin reset-admin-password 'NouveauMotDePasse'
+```
 
-- **Node Exporter Full** (ID: `1860`)
-- **Docker Monitoring** (ID: `193`) :
+## 🔔 Alertes
+
+Les alertes suivantes sont configurées dans `prometheus/alerts.yml` :
+
+| Alerte | Condition | Sévérité |
+|--------|-----------|----------|
+| `monitor_service_down` | Un service Prometheus est inaccessible | critical |
+| `high_cpu_load` | Load average > 80% du nombre de cœurs pendant 5 min | warning |
+| `high_memory_load` | Mémoire utilisée > 85% pendant 30s | warning |
+| `high_storage_load` | Disque `/` utilisé > 85% pendant 30s | warning |
+| `container_down` | Un container n'a pas été vu depuis 60s | critical |
+
+> `container_down` détecte **automatiquement tous les containers**, y compris les nouveaux - aucune configuration manuelle requise.
+
+Les notifications sont envoyées sur Telegram via **Versus-Incident** et incluent : nom du serveur, sévérité, résumé, détail et horodatage.
+
+## 📊 Dashboards
+
+**Les dashboards suivants sont pré-installés :**
+
+- **Node Exporter Full** (ID: `1860`) - métriques système
+- **Docker Monitoring** (ID: `193`) - métriques containers
 
 **Pour en ajouter d'autres :**
 
-- Visitez https://grafana.com/grafana/dashboards/
-- Récupérez l'ID du dashboard que vous voulez installer
-- Allez dans **Dashboards** > **Import**  
-- Entrez l’ID de votre dashboard et cliquez sur **Load**  
-- Sélectionnez la source de données **Prometheus** et cliquez sur **Import**  
+1. Visitez https://grafana.com/grafana/dashboards/
+2. Récupérez l'ID du dashboard souhaité
+3. Dans Grafana : **Dashboards** > **Import** > entrez l'ID > sélectionnez **Prometheus** > **Import**
 
-## 📌 Ports exposés  
+## 📌 Ports exposés
 
 | Service          | Port | URL                          |
 |------------------|------|------------------------------|
@@ -116,14 +154,12 @@ Connectez-vous avec les identifiants inscrits dans votre fichier .env :
 | AlertManager     | 9093 | `http://<SERVER_IP>:9093`    |
 | Versus-Incident  | 3001 | `http://<SERVER_IP>:3001`    |
 
-## 🛑 Arrêter et supprimer les conteneurs  
-
-Pour arrêter le monitoring :  
+## 🛑 Arrêter les services
 
 ```sh
-docker-compose down
-```  
+docker compose down
+```
 
-## 📝 Licence  
+## 📝 Licence
 
 Ce projet est sous licence MIT.
