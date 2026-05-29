@@ -14,7 +14,7 @@ services:
       prometheus:
         condition: service_healthy
       loki:
-        condition: service_healthy
+        condition: service_started
     networks:
       - monitoring_net
     volumes:
@@ -138,10 +138,10 @@ services:
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider http://localhost:3100/ready || exit 1"]
-      interval: 30s
+      interval: 15s
       timeout: 5s
-      retries: 3
-      start_period: 30s
+      retries: 10
+      start_period: 90s
 
   promtail:
     image: grafana/promtail:latest
@@ -153,7 +153,7 @@ services:
     command: -config.file=/etc/promtail/promtail.yml
     depends_on:
       loki:
-        condition: service_healthy
+        condition: service_started
     networks:
       - monitoring_net
     restart: always
