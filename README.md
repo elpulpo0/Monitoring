@@ -144,7 +144,7 @@ docker exec -it monitoring_grafana grafana cli admin reset-admin-password 'Nouve
 
 Loki centralise les logs. Promtail les collecte automatiquement depuis tous les containers Docker via le socket Docker, aucune configuration manuelle n'est requise pour les nouveaux containers.
 
-Pour consulter les logs dans Grafana : **Explore** → sélectionner la datasource **Loki** → filtrer par `container`, `service` ou `project`.
+Pour consulter les logs dans Grafana : **Menu > Drilldown > Logs** → filtrer par `container`, `service` ou `project`.
 
 ### Blackbox Exporter (surveillance HTTP)
 
@@ -202,6 +202,15 @@ Les notifications sont envoyées sur Telegram via **Versus-Incident** et incluen
 | Versus-Incident      | 3001 | `http://<SERVER_IP>:3001`    |
 | Loki                 | 3100 | `http://<SERVER_IP>:3100`    |
 | Blackbox Exporter    | 9115 | `http://<SERVER_IP>:9115`    |
+
+## 🔄 Mettre à jour les services
+
+```sh
+docker compose pull
+docker compose up -d
+```
+
+> `docker compose up -d` seul ne met pas à jour les images déjà en cache. Le `pull` est nécessaire pour récupérer les dernières versions depuis Docker Hub.
 
 ## 🛑 Arrêter les services
 
